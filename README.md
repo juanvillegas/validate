@@ -22,16 +22,20 @@ quick start
 
 2. Add the required HTML5 markup to your form, like so:
 
+```html
 <select name="mySelect" class="validate" data-rules="required,min_length:5">
 	<option>...</option>
 	<option>...</option>
 </select>
+```
 
 3. Call validate() on your form
 
+```javascript
 <script>
 	$form.validate();
 </script>
+```
 
 4. Whenever the form is submitted, the validate() function will execute and, if it fails to validate the values of your controls with your data-rules specified, it will preventDefault() the submission. A class is added to those elements that fail to validate, so you can easily display error messages just using a CSS sheet.
 
