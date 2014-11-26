@@ -1,184 +1,200 @@
 (function ( $ ) {
 
-    function _validate_exact_length( value, exact ){
-        if( value.length == exact ){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    function _validate_min_length( value, min ){
-        if( value.length >= min ){
-            return true;
-        }else{
-            return false;
-        }
-    }
+	function _validate_exact_length( value, exact ){
+		if( value.length == exact ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	function _validate_min_length( value, min ){
+		if( value.length >= min ){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
-    function _validate_max_length( value, max ){
-        if( value.length <= max ){
-            return true;
-        }else{
-            return false;
-        }
-    }
+	function _validate_max_length( value, max ){
+		if( value.length <= max ){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
-    function _validate_confirm_email( value, selector ){
-        if( value == jQuery( selector ).val() ){
-            return true;
-        }else{
-            return false;
-        }
-    }
+	function _validate_confirm_email( value, selector ){
+		if( value == jQuery( selector ).val() ){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
-    function _validate_cc( value ){
-        return _validate_numeric(value) && _validate_exact_length(value, 16);
-    }
+	function _validate_cc( value ){
+		return _validate_numeric(value) && _validate_exact_length(value, 16);
+	}
 
-    function _validate_numeric( value ){
-        var re = /^[0-9]+$/;
-        return re.test( value );
-    }
+	function _validate_numeric( value ){
+		var re = /^[0-9]+$/;
+		return re.test( value );
+	}
 
-    function _validate_email( value ){
-        var re = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-        return re.test( value );
-    }
+	function _validate_email( value ){
+		var re = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+		return re.test( value );
+	}
 
-    function _validate_phone( value ){
-        var re = /^((([0-9]{1})*[- .(]*([0-9]{3})[- .)]*[0-9]{3}[- .]*[0-9]{4})+)*$/;
-        return re.test( value );
-    }
+	function _validate_phone( value ){
+		var re = /^((([0-9]{1})*[- .(]*([0-9]{3})[- .)]*[0-9]{3}[- .]*[0-9]{4})+)*$/;
+		return re.test( value );
+	}
 
-    function _validate_required( field ){
-        if( field.val() == '' ){
-            return false;
-        }else{
-            return true;
-        }
-    }
+	function _validate_required( field ){
+		if( field.val() == '' ){
+			return false;
+		}else{
+			return true;
+		}
+	}
 
-    function _validate_checked( field ) {
-        return field.is(':checked');
-    }
+	function _validate_required_if( field, otherElement, otherValueRequired ){
+        // TODO:
+        return true;
+
+	}
+
+	function _validate_checked( field ) {
+		return field.is(':checked');
+	}
 
 
-    // name => list of errors
-    var lastValidationErrors = {};
-    var hasErrors = false;
+	// name => list of errors
+	var lastValidationErrors = {};
+	var hasErrors = false;
 
 
-    $.fn.validate = function( options ){
+	$.fn.validate = function( options ){
 
-        return this.each(function() {
+		return this.each(function() {
 
-            var $form = $(this);
+	        var $form = $(this);
 
-            $form.on('submit', function(evt){
+	        $form.on('submit', function(evt){
 
-                lastValidationErrors = new Object();
+	            lastValidationErrors = new Object();
 
-                $form.find('.validate').each(function(){
-                    var errors = $.fn.validate.getErrors( $(this) );
-                    var elemName = $(this).attr('name');
-                    if( errors.length > 0 ){
-                        lastValidationErrors[elemName] = errors;
-                    }
-                });
+	            $form.find('.validate').each(function(){
+	            	var errors = $.fn.validate.getErrors( $(this) );
+	            	var elemName = $(this).attr('name');
+	            	if( errors.length > 0 ){
+	            		lastValidationErrors[elemName] = errors;
+	            	}
+	            });
 
-                hasErrors = false;
-                for (var prop in lastValidationErrors) {
+	            if($.assocArraySize(lastValidationErrors) > 0){
                     hasErrors = true;
-                    break;
-                }
 
-                if( hasErrors ){
-                    // fire the frontend messages callback
-                    options.onSubmitErrorCallback.call(this, lastValidationErrors);
-                }else{
-                    // fire the submit callback
-                    options.onSubmitSuccessCallback.call(this);
-                }
-                evt.preventDefault();
-            });
+	            	// fire the frontend messages callback
+	            	options.onSubmitErrorCallback.call(this, lastValidationErrors);
+	            }else{
+		            // fire the submit callback
+		            options.onSubmitSuccessCallback.call(this);
+	            }
+    			evt.preventDefault();
+	        });
 
         });
-    }
+	}
 
 
-    $.fn.testForm = function( options ){
-        return this.each(function() {
-            var $form = $(this);
-            lastValidationErrors = new Object();
+	$.fn.testForm = function( o ){
+		return this.each(function() {
+			var $container = $(this);
+			lastValidationErrors = new Object();
 
-            $form.find('.validate').each(function(){
-                var errors = $.fn.validate.getErrors( $(this) );
-                var elemName = $(this).attr('name');
-                if( errors.length > 0 ){
-                    lastValidationErrors[elemName] = errors;
-                }
+            $container.find('.validate').each(function(){
+            	var errors = $.fn.validate.getErrors( $(this) );
+            	var elemName = $(this).attr('name');
+            	if( errors.length > 0 ){
+            		lastValidationErrors[elemName] = errors;
+            	}
             });
 
-            hasErrors = false;
-            for (var prop in lastValidationErrors) {
+            if( $.assocArraySize(lastValidationErrors) > 0 ){
                 hasErrors = true;
-                break;
-            }
 
-            if( hasErrors ){
-                // fire the frontend messages callback
-                options.onSubmitErrorCallback.call(this, lastValidationErrors);
+                if(o.onError){
+                    // fire the frontend messages callback
+                    o.onError($container, lastValidationErrors);
+                }
             }else{
-                // fire the submit callback
-                options.onSubmitSuccessCallback.call(this);
+                if(o.onSuccess){
+                    // fire the success callback
+                    o.onSuccess();
+                }
             }
-        });
-    }
+		});
+	}
 
 
-    $.fn.validate.getErrors = function ( $element ){
-        var errors = new Array();
+	$.fn.validate.getErrors = function ( $element ){
+		var errors = new Array();
 
-        try {
-            var value = $element.val();
-            var rules = $element.attr( 'data-rules' ).split(",");
+		try {
+			var value = $element.val();
+			var rules = $element.attr( 'data-rules' ).split(",");
 
-            $.each( rules, function(index, rule){
+			$.each( rules, function(index, rule){
 
-                var error;
+				var error;
 
                 ruleName = rule.split(":");
                 ruleName = ruleName[0];
 
                 switch( ruleName ){
-                    case 'checked':
+                    case "checked":
                         if( ! _validate_checked( $element ) ){
-                            error = 'checkbox';
+                            error = "checkbox";
                         }
                         break;
-                    case 'required':
+                    case "required":
                         if( ! _validate_required( $element ) ){
-                            error = 'required';
+                            error = "required";
                         }
                         break;
-                    case 'email':
+					case "required_if":
+                        try {
+                            var ruleParams = rule.split(":");
+
+                            var conditionSelector = ruleParams[1]; // <= ID of the condition
+                            var conditionValue = ruleParams[2]; // <= value to test against
+
+                            if( ! _validate_required_if( $element, conditionSelector, conditionValue) ){
+                                error = "required_if";
+                            }
+                        }catch( error ){
+                            console.debug('Validate: malformed rule "confirmEmail" in field ' + $element.attr('name') );
+                        }
+                        break;
+                    case "email":
                         if( ! _validate_email( value ) ){
-                            error = 'email';
+                            error = "email";
                         }
                         break;
-                    case 'numeric':
+                    case "numeric":
                         if( ! _validate_numeric( value ) ){
-                            error = 'numeric';
+                            error = "numeric";
                         }
                         break;
-                    case 'cc':
-                        if( ! _validate_cc( value.replace( /\s/g, '' ) ) ){
-                            error = 'cc';
+                    case "cc":
+                        if( ! _validate_cc( value.replace( /\s/g, "" ) ) ){
+                            error = "cc";
                         }
                         break;
-                    case 'phone':
-                        if( ! _validate_phone( value.replace( /\s/g, '' ) ) ){
-                            error = 'phone';
+                    case "phone":
+                        if( ! _validate_phone( value.replace( /\s/g, "" ) ) ){
+                            error = "phone";
                         }
                         break;
                     case 'confirmEmail':
@@ -232,7 +248,16 @@
         }
         return errors;
 
-    }// end getErrors
+	}// end getErrors
 
+
+    $.assocArraySize = function(obj) {
+        // http://stackoverflow.com/a/6700/11236
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
 
 }( jQuery ));
